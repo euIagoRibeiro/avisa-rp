@@ -2,7 +2,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { TouchableOpacity, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
-import { MapTabScreen } from '../screens/MapTabScreen';
+import { MapTabScreen } from '../features/map/MapTabScreen';
 import { ReportsScreen } from '../screens/ReportsScreen';
 
 const Tab = createBottomTabNavigator();
