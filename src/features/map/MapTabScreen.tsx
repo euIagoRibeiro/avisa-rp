@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { View, Text, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useLocationManager } from '../../hooks/useLocationManager';
 import { useReports } from '../../context/ReportsContext';
 import { Map } from '../../components/Map';
@@ -21,13 +22,20 @@ export function MapTabScreen() {
       />
 
       <View
-        className="absolute top-3 left-4 right-4 bg-white rounded-xl px-4 py-3"
-        style={{ elevation: 4 }}
+        className="absolute top-3 left-4 right-4 bg-white rounded-2xl px-4 py-3.5 flex-row items-center gap-2"
+        style={{
+          elevation: 4,
+          shadowColor: '#000',
+          shadowOpacity: 0.08,
+          shadowRadius: 8,
+          shadowOffset: { width: 0, height: 2 },
+        }}
       >
+        <Ionicons name="navigate-outline" size={18} color="#9ca3af" />
         {isGeocoding ? (
           <ActivityIndicator size="small" color="#2563eb" />
         ) : (
-          <Text className="text-gray-700 text-sm" numberOfLines={2}>
+          <Text className="text-gray-700 text-base flex-1" numberOfLines={1}>
             {address}
           </Text>
         )}
@@ -35,12 +43,14 @@ export function MapTabScreen() {
 
       <TouchableOpacity
         onPress={() => setShowHeatmap((prev) => !prev)}
-        className="absolute bottom-6 left-4 bg-white rounded-full px-4 h-12 items-center justify-center"
-        style={{ elevation: 4 }}
+        className="absolute right-4 bg-white rounded-full w-14 h-14 items-center justify-center"
+        style={{ bottom: 88, elevation: 4 }}
       >
-        <Text className="text-blue-600 font-medium text-sm">
-          {showHeatmap ? 'Marcadores' : 'Heatmap'}
-        </Text>
+        <Ionicons
+          name={showHeatmap ? 'pin-outline' : 'radio-outline'}
+          size={24}
+          color="#2563eb"
+        />
       </TouchableOpacity>
     </View>
   );

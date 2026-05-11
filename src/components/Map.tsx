@@ -1,5 +1,6 @@
 import { useRef, useEffect } from 'react';
-import { View, TouchableOpacity, Text } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import MapView, { Region, Marker, Heatmap } from 'react-native-maps';
 import { Report, ReportStatus } from '../types';
 
@@ -57,8 +58,10 @@ export function Map({ coordinates, onRegionChange, onLocationPress, reports, sho
             <Marker
               key={r.id}
               coordinate={{ latitude: r.coordinates.lat, longitude: r.coordinates.lon }}
-              pinColor={statusPinColor(r.status)}
-            />
+              anchor={{ x: 0.5, y: 1 }}
+            >
+              <Ionicons name="location" size={28} color={statusPinColor(r.status)} />
+            </Marker>
           ))
         )}
       </MapView>
@@ -73,10 +76,10 @@ export function Map({ coordinates, onRegionChange, onLocationPress, reports, sho
 
       <TouchableOpacity
         onPress={onLocationPress}
-        className="absolute bottom-6 right-4 bg-white rounded-full w-12 h-12 items-center justify-center"
+        className="absolute bottom-6 right-4 bg-white rounded-full w-14 h-14 items-center justify-center"
         style={{ elevation: 4 }}
       >
-        <Text className="text-2xl">📍</Text>
+        <Ionicons name="locate-outline" size={24} color="#2563eb" />
       </TouchableOpacity>
     </View>
   );
