@@ -19,6 +19,13 @@
         {
           "locationWhenInUsePermission": "O Avisa RP precisa da sua localização para exibir problemas próximos a você."
         }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "O Avisa RP precisa acessar suas fotos para anexar imagens ao relato.",
+          "cameraPermission": "O Avisa RP precisa acessar sua câmera para fotografar o problema."
+        }
       ]
     ],
     "ios": {
