@@ -16,6 +16,18 @@ import { Ionicons } from '@expo/vector-icons';
 import { CATEGORIES } from '../constants/categories';
 import { useIssueForm } from '../hooks/useIssueForm';
 
+const CATEGORY_META: Record<string, { icon: string; color: string; bg: string; bgSelected: string }> = {
+  'Buraco':             { icon: 'construct-outline',     color: '#ef4444', bg: '#fee2e2', bgSelected: '#fecaca' },
+  'Iluminação Pública': { icon: 'bulb-outline',          color: '#f59e0b', bg: '#fef3c7', bgSelected: '#fde68a' },
+  'Lixo':               { icon: 'trash-outline',         color: '#10b981', bg: '#d1fae5', bgSelected: '#a7f3d0' },
+  'Poda de Árvore':     { icon: 'leaf-outline',          color: '#22c55e', bg: '#dcfce7', bgSelected: '#bbf7d0' },
+  'Foco de Dengue':     { icon: 'water-outline',         color: '#0891b2', bg: '#cffafe', bgSelected: '#a5f3fc' },
+  'Sinalização':        { icon: 'warning-outline',       color: '#a855f7', bg: '#f3e8ff', bgSelected: '#e9d5ff' },
+  'Vazamento de Água':  { icon: 'rainy-outline',         color: '#3b82f6', bg: '#dbeafe', bgSelected: '#bfdbfe' },
+  'Calçada Danificada': { icon: 'walk-outline',          color: '#f97316', bg: '#ffedd5', bgSelected: '#fed7aa' },
+  'Outros':             { icon: 'help-circle-outline',   color: '#6b7280', bg: '#f3f4f6', bgSelected: '#e5e7eb' },
+};
+
 interface IssueModalProps {
   visible: boolean;
   onClose: () => void;
@@ -111,27 +123,43 @@ export function IssueModal({ visible, onClose, address, coordinates }: IssueModa
                   horizontal
                   showsHorizontalScrollIndicator={false}
                   className="mb-4"
-                  contentContainerStyle={{ gap: 8, paddingRight: 4 }}
+                  contentContainerStyle={{ gap: 10, paddingRight: 4 }}
                 >
-                  {CATEGORIES.map((cat) => (
-                    <TouchableOpacity
-                      key={cat}
-                      onPress={() => setField('category', cat)}
-                      className={`px-3.5 py-2 rounded-full border ${
-                        form.category === cat
-                          ? 'bg-blue-600 border-blue-600'
-                          : 'bg-white border-gray-200'
-                      }`}
-                    >
-                      <Text
-                        className={`text-sm ${
-                          form.category === cat ? 'text-white font-medium' : 'text-gray-600'
-                        }`}
+                  {CATEGORIES.map((cat) => {
+                    const meta = CATEGORY_META[cat];
+                    const selected = form.category === cat;
+                    return (
+                      <TouchableOpacity
+                        key={cat}
+                        onPress={() => setField('category', cat)}
+                        style={{
+                          width: 80,
+                          height: 72,
+                          borderRadius: 16,
+                          backgroundColor: selected ? meta.bgSelected : meta.bg,
+                          borderWidth: 2,
+                          borderColor: selected ? '#2563eb' : 'transparent',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          paddingHorizontal: 6,
+                        }}
                       >
-                        {cat}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
+                        <Ionicons name={meta.icon as any} size={22} color={meta.color} />
+                        <Text
+                          numberOfLines={2}
+                          style={{
+                            fontSize: 11,
+                            fontWeight: '600',
+                            color: meta.color,
+                            textAlign: 'center',
+                            marginTop: 4,
+                          }}
+                        >
+                          {cat}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
                 </ScrollView>
 
                 <Text className="text-sm font-medium text-gray-700 mb-1.5">Descrição</Text>
