@@ -1,6 +1,7 @@
 import { useRef, useEffect } from 'react';
 import { View, TouchableOpacity, Text } from 'react-native';
-import MapView, { Region, UrlTile } from 'react-native-maps';
+import MapView, { Region, Marker, Heatmap } from 'react-native-maps';
+import { Report, ReportStatus } from '../types';
 
 const RP_INITIAL_REGION: Region = {
   latitude: -21.1767,
@@ -9,16 +10,21 @@ const RP_INITIAL_REGION: Region = {
   longitudeDelta: 0.05,
 };
 
-const CARTO_VOYAGER =
-  'https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png';
+function statusPinColor(status: ReportStatus): string {
+  if (status === 'Pendente') return '#ef4444';
+  if (status === 'Analisando') return '#f59e0b';
+  return '#22c55e';
+}
 
 interface MapProps {
   coordinates: { latitude: number; longitude: number } | null;
   onRegionChange: (region: Region) => void;
   onLocationPress: () => void;
+  reports: Report[];
+  showHeatmap: boolean;
 }
 
-export function Map({ coordinates, onRegionChange, onLocationPress }: MapProps) {
+export function Map({ coordinates, onRegionChange, onLocationPress, reports, showHeatmap }: MapProps) {
   const mapRef = useRef<MapView>(null);
 
   useEffect(() => {
@@ -34,12 +40,27 @@ export function Map({ coordinates, onRegionChange, onLocationPress }: MapProps) 
       <MapView
         ref={mapRef}
         style={{ flex: 1 }}
-        mapType="none"
         initialRegion={RP_INITIAL_REGION}
         showsUserLocation
         onRegionChangeComplete={onRegionChange}
       >
-        <UrlTile urlTemplate={CARTO_VOYAGER} maximumZ={19} flipY={false} />
+        {showHeatmap ? (
+          <Heatmap
+            points={reports.map((r) => ({
+              latitude: r.coordinates.lat,
+              longitude: r.coordinates.lon,
+              weight: 1,
+            }))}
+          />
+        ) : (
+          reports.map((r) => (
+            <Marker
+              key={r.id}
+              coordinate={{ latitude: r.coordinates.lat, longitude: r.coordinates.lon }}
+              pinColor={statusPinColor(r.status)}
+            />
+          ))
+        )}
       </MapView>
 
       <View pointerEvents="none" className="absolute inset-0 items-center justify-center">
