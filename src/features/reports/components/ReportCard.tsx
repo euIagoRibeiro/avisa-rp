@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Report, ReportStatus } from '../../../types';
 
@@ -62,42 +62,194 @@ export function ReportCard({ report, onPress }: ReportCardProps) {
   const color =  CATEGORY_COLOR[report.category] ?? '#6b7280';
   const bg    =  CATEGORY_BG[report.category]    ?? '#f3f4f6';
   const badge = statusBadge(report.status);
+  const photo = report.photos[0] ?? null;
 
   return (
     <TouchableOpacity
       onPress={onPress}
-      activeOpacity={onPress ? 0.7 : 1}
-      className="bg-white rounded-2xl p-4 flex-row items-start gap-3"
+      activeOpacity={0.75}
       style={{
-        elevation: 1,
+        backgroundColor: '#fff',
+        borderRadius: 16,
+        overflow: 'hidden',
+        borderWidth: 1,
+        borderColor: '#f0f0f0',
+        elevation: 3,
         shadowColor: '#000',
-        shadowOpacity: 0.06,
-        shadowRadius: 4,
-        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.08,
+        shadowRadius: 8,
+        shadowOffset: { width: 0, height: 2 },
       }}
     >
+      {/* Left accent bar — colored by category */}
       <View
-        className="w-10 h-10 rounded-full items-center justify-center flex-shrink-0"
-        style={{ backgroundColor: bg }}
-      >
-        <Ionicons name={icon} size={20} color={color} />
-      </View>
+        style={{
+          position: 'absolute',
+          left: 0,
+          top: 0,
+          bottom: 0,
+          width: 4,
+          backgroundColor: color,
+        }}
+      />
 
-      <View className="flex-1">
-        <View className="flex-row items-start justify-between gap-2 mb-0.5">
-          <Text className="text-gray-900 font-semibold text-sm flex-1" numberOfLines={2}>
+      {/* Header: icon + category/title + status badge */}
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'flex-start',
+          paddingTop: 14,
+          paddingRight: 14,
+          paddingBottom: 10,
+          paddingLeft: 18,
+          gap: 10,
+        }}
+      >
+        <View
+          style={{
+            width: 42,
+            height: 42,
+            borderRadius: 10,
+            backgroundColor: bg,
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+          }}
+        >
+          <Ionicons name={icon} size={20} color={color} />
+        </View>
+
+        <View style={{ flex: 1 }}>
+          <Text
+            style={{
+              fontSize: 10,
+              fontWeight: '700',
+              color,
+              letterSpacing: 0.8,
+              textTransform: 'uppercase',
+              marginBottom: 2,
+            }}
+          >
+            {report.category}
+          </Text>
+          <Text
+            style={{ fontSize: 14, fontWeight: '600', color: '#111827', lineHeight: 19 }}
+            numberOfLines={2}
+          >
             {report.title}
           </Text>
-          <View className="rounded-full px-2 py-0.5 flex-shrink-0" style={{ backgroundColor: badge.bg }}>
-            <Text style={{ color: badge.color, fontSize: 11, fontWeight: '600' }}>
-              {report.status}
+        </View>
+
+        <View
+          style={{
+            backgroundColor: badge.bg,
+            borderRadius: 999,
+            paddingHorizontal: 8,
+            paddingVertical: 3,
+            flexShrink: 0,
+          }}
+        >
+          <Text style={{ fontSize: 11, fontWeight: '700', color: badge.color }}>
+            {report.status}
+          </Text>
+        </View>
+      </View>
+
+      {/* Photo thumbnail — shown only when report has photos */}
+      {!!photo && (
+        <View
+          style={{
+            marginHorizontal: 14,
+            marginBottom: 10,
+            borderRadius: 12,
+            overflow: 'hidden',
+            height: 120,
+          }}
+        >
+          <Image
+            source={{ uri: photo }}
+            style={{ width: '100%', height: '100%' }}
+            resizeMode="cover"
+          />
+          <View
+            style={{
+              position: 'absolute',
+              bottom: 8,
+              right: 8,
+              backgroundColor: 'rgba(0,0,0,0.50)',
+              borderRadius: 999,
+              flexDirection: 'row',
+              alignItems: 'center',
+              paddingHorizontal: 8,
+              paddingVertical: 3,
+            }}
+          >
+            <Ionicons name="camera" size={11} color="#fff" />
+            <Text style={{ color: '#fff', fontSize: 10, fontWeight: '600', marginLeft: 4 }}>
+              {report.photos.length} foto{report.photos.length > 1 ? 's' : ''}
             </Text>
           </View>
         </View>
-        <Text className="text-gray-500 text-xs mb-0.5" numberOfLines={1}>
+      )}
+
+      {/* Address row */}
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          marginHorizontal: 14,
+          marginBottom: report.description ? 8 : 10,
+          backgroundColor: '#f9fafb',
+          borderRadius: 10,
+          paddingHorizontal: 10,
+          paddingVertical: 7,
+        }}
+      >
+        <Ionicons name="location-outline" size={13} color="#9ca3af" />
+        <Text
+          style={{ fontSize: 12, color: '#6b7280', marginLeft: 6, flex: 1 }}
+          numberOfLines={1}
+        >
           {report.address}
         </Text>
-        <Text className="text-gray-400 text-xs">{formatDate(report.createdAt)}</Text>
+      </View>
+
+      {/* Description preview */}
+      {!!report.description && (
+        <Text
+          style={{
+            fontSize: 12,
+            color: '#9ca3af',
+            fontStyle: 'italic',
+            marginHorizontal: 14,
+            marginBottom: 10,
+          }}
+          numberOfLines={2}
+        >
+          "{report.description}"
+        </Text>
+      )}
+
+      {/* Footer: date + anonymous indicator + chevron */}
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          paddingHorizontal: 14,
+          paddingBottom: 12,
+        }}
+      >
+        <Text style={{ fontSize: 11, color: '#9ca3af' }}>{formatDate(report.createdAt)}</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          {report.isAnonymous && (
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+              <Ionicons name="eye-off-outline" size={12} color="#9ca3af" />
+              <Text style={{ fontSize: 11, color: '#9ca3af' }}>Anônimo</Text>
+            </View>
+          )}
+          <Ionicons name="chevron-forward" size={16} color="#d1d5db" />
+        </View>
       </View>
     </TouchableOpacity>
   );
