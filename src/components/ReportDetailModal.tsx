@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import * as Haptics from 'expo-haptics';
 import {
   Modal,
   View,
@@ -66,6 +67,7 @@ export function ReportDetailModal({ report, onClose }: Props) {
     setSaving(true);
     await updateStatus(report.id, newStatus, comment.trim());
     setSaving(false);
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     onClose();
   }
 

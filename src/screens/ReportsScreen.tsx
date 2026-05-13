@@ -1,13 +1,14 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
   FlatList,
-  ActivityIndicator,
+  Animated,
   ScrollView,
 } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
 import { useReports } from '../context/ReportsContext';
 import { useAuth } from '../context/AuthContext';
@@ -16,6 +17,52 @@ import { ReportCard } from '../features/reports/components/ReportCard';
 import { EmptyState } from '../features/reports/components/EmptyState';
 import { ReportDetailModal } from '../components/ReportDetailModal';
 import { Report, ReportStatus } from '../types';
+
+function SkeletonCard() {
+  const opacity = useRef(new Animated.Value(0.4)).current;
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(opacity, { toValue: 1, duration: 700, useNativeDriver: true }),
+        Animated.timing(opacity, { toValue: 0.4, duration: 700, useNativeDriver: true }),
+      ]),
+    ).start();
+  }, [opacity]);
+
+  return (
+    <Animated.View
+      style={{
+        opacity,
+        backgroundColor: '#fff',
+        borderRadius: 16,
+        padding: 14,
+        borderWidth: 1,
+        borderColor: '#f0f0f0',
+        elevation: 3,
+        shadowColor: '#000',
+        shadowOpacity: 0.06,
+        shadowRadius: 6,
+        shadowOffset: { width: 0, height: 2 },
+        marginBottom: 12,
+      }}
+    >
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+        <View style={{ width: 42, height: 42, borderRadius: 10, backgroundColor: '#e5e7eb' }} />
+        <View style={{ flex: 1, gap: 6 }}>
+          <View style={{ height: 10, borderRadius: 6, backgroundColor: '#e5e7eb', width: '40%' }} />
+          <View style={{ height: 14, borderRadius: 6, backgroundColor: '#e5e7eb', width: '80%' }} />
+        </View>
+        <View style={{ width: 64, height: 22, borderRadius: 999, backgroundColor: '#e5e7eb' }} />
+      </View>
+      <View style={{ height: 34, borderRadius: 10, backgroundColor: '#f3f4f6', marginBottom: 10 }} />
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+        <View style={{ height: 11, width: 80, borderRadius: 6, backgroundColor: '#e5e7eb' }} />
+        <View style={{ height: 11, width: 20, borderRadius: 6, backgroundColor: '#e5e7eb' }} />
+      </View>
+    </Animated.View>
+  );
+}
 
 const FILTERS: Array<{ label: string; value: ReportStatus | 'Todos'; dot?: string }> = [
   { label: 'Todos',      value: 'Todos' },
@@ -105,7 +152,10 @@ export function ReportsScreen() {
             return (
               <TouchableOpacity
                 key={value}
-                onPress={() => setActiveFilter(value)}
+                onPress={() => {
+                  Haptics.selectionAsync();
+                  setActiveFilter(value);
+                }}
                 className={`flex-row items-center px-3.5 py-1.5 rounded-full border ${
                   active ? 'bg-blue-600 border-blue-600' : 'bg-white border-gray-200'
                 }`}
@@ -136,8 +186,10 @@ export function ReportsScreen() {
 
       {/* List */}
       {loading ? (
-        <View className="flex-1 items-center justify-center">
-          <ActivityIndicator color="#2563eb" />
+        <View style={{ padding: 16 }}>
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
         </View>
       ) : (
         <FlatList

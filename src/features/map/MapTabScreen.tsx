@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { View, Text, ActivityIndicator, TouchableOpacity } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocationManager } from '../../hooks/useLocationManager';
 import { useReports } from '../../context/ReportsContext';
 import { useAuth } from '../../context/AuthContext';
 import { Map } from '../../components/Map';
 import { IssueModal } from '../../components/IssueModal';
+import { SuccessToast } from '../../components/SuccessToast';
 
 export function MapTabScreen() {
   const { address, coordinates, isGeocoding, requestLocationPermission, handleRegionChange } =
@@ -14,6 +16,7 @@ export function MapTabScreen() {
   const { user } = useAuth();
   const [showHeatmap, setShowHeatmap] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const [showToast, setShowToast] = useState(false);
 
   return (
     <View className="flex-1">
@@ -47,7 +50,10 @@ export function MapTabScreen() {
 
       {user?.role === 'cidadao' && (
         <TouchableOpacity
-          onPress={() => setModalVisible(true)}
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            setModalVisible(true);
+          }}
           className="absolute right-4 bg-blue-600 rounded-full w-14 h-14 items-center justify-center"
           style={{ bottom: 152, elevation: 4 }}
         >
@@ -70,8 +76,13 @@ export function MapTabScreen() {
       <IssueModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
+        onSuccess={() => setShowToast(true)}
         address={address}
         coordinates={coordinates}
+      />
+      <SuccessToast
+        visible={showToast}
+        onHide={() => setShowToast(false)}
       />
     </View>
   );

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import * as Haptics from 'expo-haptics';
 import {
   Modal,
   View,
@@ -31,11 +32,12 @@ const CATEGORY_META: Record<string, { icon: string; color: string; bg: string; b
 interface IssueModalProps {
   visible: boolean;
   onClose: () => void;
+  onSuccess?: () => void;
   address: string;
   coordinates: { latitude: number; longitude: number } | null;
 }
 
-export function IssueModal({ visible, onClose, address, coordinates }: IssueModalProps) {
+export function IssueModal({ visible, onClose, onSuccess, address, coordinates }: IssueModalProps) {
   const [step, setStep] = useState<1 | 2>(1);
   const { form, setField, pickImage, isValid, submit, reset } = useIssueForm();
   const [submitting, setSubmitting] = useState(false);
@@ -51,6 +53,8 @@ export function IssueModal({ visible, onClose, address, coordinates }: IssueModa
     setSubmitting(true);
     await submit(address, coordinates);
     setSubmitting(false);
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    onSuccess?.();
     handleClose();
   }
 
@@ -91,7 +95,10 @@ export function IssueModal({ visible, onClose, address, coordinates }: IssueModa
                     <Text className="text-gray-600 font-medium">Cancelar</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    onPress={() => setStep(2)}
+                    onPress={() => {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                      setStep(2);
+                    }}
                     className="flex-1 py-3.5 rounded-2xl bg-blue-600 items-center"
                   >
                     <Text className="text-white font-medium">Confirmar →</Text>
