@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   View,
   Text,
@@ -13,7 +14,8 @@ import { useAuth } from '../context/AuthContext';
 import { useReportsFilter } from '../hooks/useReportsFilter';
 import { ReportCard } from '../features/reports/components/ReportCard';
 import { EmptyState } from '../features/reports/components/EmptyState';
-import { ReportStatus } from '../types';
+import { ReportDetailModal } from '../components/ReportDetailModal';
+import { Report, ReportStatus } from '../types';
 
 const FILTERS: Array<{ label: string; value: ReportStatus | 'Todos'; dot?: string }> = [
   { label: 'Todos',      value: 'Todos' },
@@ -26,6 +28,7 @@ export function ReportsScreen() {
   const { reports, loading } = useReports();
   const { user } = useAuth();
   const isAdmin = user!.role === 'admin';
+  const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const { filtered, search, setSearch, activeFilter, setActiveFilter, stats } = useReportsFilter(
     reports,
     user!.id,
@@ -140,13 +143,19 @@ export function ReportsScreen() {
         <FlatList
           data={filtered}
           keyExtractor={(r) => r.id}
-          renderItem={({ item }) => <ReportCard report={item} />}
+          renderItem={({ item }) => (
+            <ReportCard report={item} onPress={() => setSelectedReport(item)} />
+          )}
           contentContainerStyle={{ padding: 16 }}
           ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
           ListEmptyComponent={<EmptyState />}
           showsVerticalScrollIndicator={false}
         />
       )}
+      <ReportDetailModal
+        report={selectedReport}
+        onClose={() => setSelectedReport(null)}
+      />
     </View>
   );
 }
