@@ -6,7 +6,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { AuthProvider, useAuth } from './src/context/AuthContext';
 import { ReportsProvider, useReports } from './src/context/ReportsContext';
-import { LoginScreen } from './src/screens/LoginScreen';
+import { AuthStack } from './src/navigation/AuthStack';
 import { TabNavigator } from './src/navigation/TabNavigator';
 
 function ErrorBanner() {
@@ -43,7 +43,7 @@ function RootNavigator() {
   const { user } = useAuth();
   return (
     <View style={{ flex: 1 }}>
-      {user ? <TabNavigator /> : <LoginScreen />}
+      {user ? <TabNavigator /> : <AuthStack />}
       <ErrorBanner />
     </View>
   );

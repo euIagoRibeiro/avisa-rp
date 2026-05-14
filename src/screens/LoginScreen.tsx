@@ -10,37 +10,16 @@ import {
   ScrollView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useAuth } from '../context/AuthContext';
+import { CityGrid } from '../components/CityGrid';
+import { AuthStackParamList } from '../navigation/types';
 
-const GRID_PATTERN = [
-  [true, false, true],
-  [false, true, false],
-  [true, false, true],
-] as const;
-
-function CityGrid() {
-  return (
-    <View style={{ gap: 4 }}>
-      {GRID_PATTERN.map((row, i) => (
-        <View key={i} style={{ flexDirection: 'row', gap: 4 }}>
-          {row.map((filled, j) => (
-            <View
-              key={j}
-              style={{
-                width: 10,
-                height: 10,
-                borderRadius: 2,
-                backgroundColor: filled ? '#38bdf8' : 'rgba(56,189,248,0.12)',
-              }}
-            />
-          ))}
-        </View>
-      ))}
-    </View>
-  );
-}
+type NavProp = NativeStackNavigationProp<AuthStackParamList, 'Login'>;
 
 export function LoginScreen() {
+  const navigation = useNavigation<NavProp>();
   const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -235,8 +214,16 @@ export function LoginScreen() {
           </TouchableOpacity>
         </View>
 
+        {/* Link para cadastro */}
+        <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 4, marginTop: 24 }}>
+          <Text style={{ fontSize: 13, color: '#64748b' }}>Não tem conta?</Text>
+          <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+            <Text style={{ fontSize: 13, color: '#38bdf8', fontWeight: '600' }}>Criar conta</Text>
+          </TouchableOpacity>
+        </View>
+
         {/* Rodapé */}
-        <Text style={{ fontSize: 12, color: '#475569', textAlign: 'center', marginTop: 24 }}>
+        <Text style={{ fontSize: 12, color: '#475569', textAlign: 'center', marginTop: 16 }}>
           Da rua para a prefeitura
         </Text>
       </ScrollView>
