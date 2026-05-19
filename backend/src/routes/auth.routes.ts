@@ -55,6 +55,10 @@ const LoginSchema = z.object({
   password: z.string().min(1),
 });
 
+const ResendOTPSchema = z.object({
+  phone: z.string().min(10).max(15),
+});
+
 // ── POST /v1/auth/register ────────────────────────────────────────────────────
 
 router.post('/register', async (req: Request, res: Response): Promise<void> => {
@@ -221,6 +225,51 @@ router.post('/login', async (req: Request, res: Response): Promise<void> => {
     });
   } catch (err) {
     console.error('[login]', err);
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+});
+
+// ── POST /v1/auth/resend-otp ──────────────────────────────────────────────────
+
+router.post('/resend-otp', async (req: Request, res: Response): Promise<void> => {
+  const parsed = ResendOTPSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(422).json({ error: 'Dados inválidos', details: parsed.error.flatten() });
+    return;
+  }
+
+  const phone     = normalizePhone(parsed.data.phone);
+  const phoneHash = sha256(phone);
+
+  try {
+    const existing = await db('otp_codes').where('phone_hash', phoneHash).first();
+
+    if (!existing) {
+      res.status(404).json({ error: 'Cadastro pendente não encontrado' });
+      return;
+    }
+
+    await db('otp_codes').where('phone_hash', phoneHash).delete();
+
+    const otpCode   = generateOTP();
+    const otpHash   = sha256(otpCode);
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+    await db('otp_codes').insert({
+      id:         randomUUID(),
+      phone_hash: phoneHash,
+      code_hash:  otpHash,
+      name:       existing.name,
+      email:      existing.email,
+      password:   existing.password,
+      expires_at: expiresAt,
+    });
+
+    console.log(`[OTP REENVIO] Telefone: ${phone} | Código: ${otpCode}`);
+
+    res.status(200).json({ message: `Novo código enviado para ${formatPhone(phone)}` });
+  } catch (err) {
+    console.error('[resend-otp]', err);
     res.status(500).json({ error: 'Erro interno do servidor' });
   }
 });
