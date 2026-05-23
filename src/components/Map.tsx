@@ -43,6 +43,7 @@ export function Map({ coordinates, onRegionChange, onLocationPress, reports, sho
         style={{ flex: 1 }}
         initialRegion={RP_INITIAL_REGION}
         showsUserLocation
+        showsMyLocationButton={false}
         onRegionChangeComplete={onRegionChange}
       >
         {showHeatmap ? (

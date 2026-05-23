@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { View, Text, ActivityIndicator, TouchableOpacity, StyleSheet } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocationManager } from '../../hooks/useLocationManager';
@@ -28,24 +28,20 @@ export function MapTabScreen() {
         showHeatmap={showHeatmap}
       />
 
-      <View
-        className="absolute top-3 left-4 right-4 bg-white rounded-2xl px-4 py-3.5 flex-row items-center gap-2"
-        style={{
-          elevation: 4,
-          shadowColor: '#000',
-          shadowOpacity: 0.08,
-          shadowRadius: 8,
-          shadowOffset: { width: 0, height: 2 },
-        }}
-      >
-        <Ionicons name="navigate-outline" size={18} color="#9ca3af" />
-        {isGeocoding ? (
-          <ActivityIndicator size="small" color="#2563eb" />
-        ) : (
-          <Text className="text-gray-700 text-base flex-1" numberOfLines={1}>
-            {address}
-          </Text>
-        )}
+      <View style={styles.addressBar}>
+        <View style={styles.iconColumn}>
+          <Ionicons name="navigate-outline" size={18} color="#0ea5e9" />
+        </View>
+        <View style={styles.separator} />
+        <View style={styles.textArea}>
+          {isGeocoding ? (
+            <ActivityIndicator size="small" color="#0ea5e9" />
+          ) : (
+            <Text style={styles.addressText} numberOfLines={1} ellipsizeMode="tail">
+              {address}
+            </Text>
+          )}
+        </View>
       </View>
 
       {user?.role === 'cidadao' && (
@@ -87,3 +83,48 @@ export function MapTabScreen() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  addressBar: {
+    position: 'absolute',
+    top: 12,
+    left: 16,
+    right: 16,
+    backgroundColor: 'white',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#cbd5e1',
+    elevation: 8,
+    shadowColor: '#64748b',
+    shadowOpacity: 0.22,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 2 },
+    flexDirection: 'row',
+    alignItems: 'stretch',
+    overflow: 'hidden',
+  },
+  iconColumn: {
+    width: 48,
+    backgroundColor: 'white',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 14,
+  },
+  separator: {
+    width: 1,
+    backgroundColor: '#e2e8f0',
+  },
+  textArea: {
+    flex: 1,
+    flexShrink: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 14,
+    justifyContent: 'center',
+    backgroundColor: 'white',
+  },
+  addressText: {
+    fontSize: 16,
+    color: '#0f172a',
+    fontWeight: '500',
+  },
+});
