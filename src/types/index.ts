@@ -1,5 +1,12 @@
 export type UserRole = 'cidadao' | 'admin';
 
+export interface RegisterData {
+  name: string;
+  email: string;
+  phone: string;
+  password: string;
+}
+
 export interface User {
   id: string;
   name: string;
