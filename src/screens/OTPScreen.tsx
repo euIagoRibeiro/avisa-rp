@@ -66,8 +66,7 @@ export function OTPScreen() {
     if (code.length < 6) { setError('Digite todos os 6 dígitos'); return; }
     setError('');
     setLoading(true);
-    await new Promise(r => setTimeout(r, 600));
-    const ok = verifyOTP(code);
+    const ok = await verifyOTP(code);
     setLoading(false);
     if (!ok) setError('Código inválido. Tente novamente.');
   }

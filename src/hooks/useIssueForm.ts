@@ -53,7 +53,6 @@ export function useIssueForm() {
 
     const report: Report = {
       id: Date.now().toString(),
-      tenantId: 'ribeirao-preto',
       userId: user.id,
       title: form.title.trim(),
       description: form.description.trim(),

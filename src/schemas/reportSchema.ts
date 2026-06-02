@@ -10,7 +10,7 @@ export const ReportUpdateSchema = z.object({
 
 export const ReportSchema = z.object({
   id:          z.string().min(1),
-  tenantId:    z.string().min(1),
+  tenantId:    z.string().min(1).optional(),
   userId:      z.string().min(1),
   title:       z.string().min(1).max(80),
   description: z.string().max(500),

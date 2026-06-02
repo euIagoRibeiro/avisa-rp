@@ -24,7 +24,7 @@ export interface ReportUpdate {
 
 export interface Report {
   id: string;
-  tenantId: string;
+  tenantId?: string;
   userId: string;
   title: string;
   description: string;

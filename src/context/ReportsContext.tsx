@@ -1,14 +1,13 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Report, ReportStatus } from '../types';
-import { MOCK_REPORTS } from '../constants/mockData';
+import { useAuth } from './AuthContext';
 import {
   getReports,
   addReport as storageAdd,
   updateReport as storageUpdate,
   deleteReport as storageDelete,
+  updateReportStatus as storageUpdateStatus,
 } from '../repositories/ReportRepository';
-
-const TENANT_ID = 'ribeirao-preto';
 
 interface ReportsContextValue {
   reports: Report[];
@@ -24,6 +23,7 @@ interface ReportsContextValue {
 const ReportsContext = createContext<ReportsContextValue | null>(null);
 
 export function ReportsProvider({ children }: { children: React.ReactNode }) {
+  const { user } = useAuth();
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -33,15 +33,14 @@ export function ReportsProvider({ children }: { children: React.ReactNode }) {
   }
 
   useEffect(() => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
     async function load() {
       try {
-        let stored = await getReports(TENANT_ID);
-        if (stored.length === 0) {
-          for (const report of MOCK_REPORTS) {
-            await storageAdd(report);
-          }
-          stored = MOCK_REPORTS;
-        }
+        const stored = await getReports();
         setReports(stored);
       } catch {
         setError('Erro ao carregar os relatos.');
@@ -50,12 +49,12 @@ export function ReportsProvider({ children }: { children: React.ReactNode }) {
       }
     }
     load();
-  }, []);
+  }, [user]);
 
   async function addReport(report: Report) {
     try {
-      await storageAdd(report);
-      setReports((prev) => [...prev, report]);
+      const saved = await storageAdd(report);
+      setReports((prev) => [...prev, saved]);
     } catch {
       setError('Erro ao salvar relato. Tente novamente.');
     }
@@ -72,7 +71,7 @@ export function ReportsProvider({ children }: { children: React.ReactNode }) {
 
   async function deleteReport(id: string) {
     try {
-      await storageDelete(id, TENANT_ID);
+      await storageDelete(id);
       setReports((prev) => prev.filter((r) => r.id !== id));
     } catch {
       setError('Erro ao excluir relato.');
@@ -91,7 +90,7 @@ export function ReportsProvider({ children }: { children: React.ReactNode }) {
       ],
     };
     try {
-      await storageUpdate(updated);
+      await storageUpdateStatus(id, status, comment);
       setReports((prev) => prev.map((r) => (r.id === updated.id ? updated : r)));
     } catch {
       setError('Erro ao atualizar o status.');

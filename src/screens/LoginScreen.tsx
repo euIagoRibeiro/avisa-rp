@@ -31,8 +31,7 @@ export function LoginScreen() {
   async function handleLogin() {
     setError('');
     setLoading(true);
-    await new Promise(r => setTimeout(r, 400));
-    const success = login(email.trim(), password);
+    const success = await login(email.trim(), password);
     if (!success) setError('Email ou senha incorretos');
     setLoading(false);
   }
