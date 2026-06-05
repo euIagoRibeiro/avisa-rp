@@ -1,9 +1,9 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { TouchableOpacity, View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useAuth } from '../context/AuthContext';
 import { MapTabScreen } from '../features/map/MapTabScreen';
 import { ReportsScreen } from '../screens/ReportsScreen';
+import { ProfileScreen } from '../screens/ProfileScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -20,27 +20,23 @@ function BrandTitle() {
   );
 }
 
-function LogoutButton() {
-  const { logout } = useAuth();
-  return (
-    <TouchableOpacity onPress={logout} style={styles.logoutButton}>
-      <Ionicons name="log-out-outline" size={22} color="#0ea5e9" />
-    </TouchableOpacity>
-  );
-}
-
 export function TabNavigator() {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerTitle: () => <BrandTitle />,
         headerTitleAlign: 'left',
-        headerRight: () => <LogoutButton />,
         headerStyle: styles.header,
         headerShadowVisible: false,
         tabBarIcon: ({ color, size }) => {
-          const icon: IoniconsName =
-            route.name === 'Mapa' ? 'map-outline' : 'list-outline';
+          let icon: IoniconsName;
+          if (route.name === 'Mapa') {
+            icon = 'map-outline';
+          } else if (route.name === 'Relatos') {
+            icon = 'list-outline';
+          } else {
+            icon = 'person-outline';
+          }
           return <Ionicons name={icon} size={size} color={color} />;
         },
         tabBarActiveTintColor: '#0ea5e9',
@@ -51,6 +47,7 @@ export function TabNavigator() {
     >
       <Tab.Screen name="Mapa" component={MapTabScreen} />
       <Tab.Screen name="Relatos" component={ReportsScreen} />
+      <Tab.Screen name="Perfil" component={ProfileScreen} />
     </Tab.Navigator>
   );
 }
@@ -81,9 +78,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: 'white',
     letterSpacing: 0.5,
-  },
-  logoutButton: {
-    marginRight: 16,
   },
   tabBar: {
     borderTopColor: '#e2e8f0',
