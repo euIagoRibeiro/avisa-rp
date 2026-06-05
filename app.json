@@ -40,6 +40,7 @@
         "backgroundColor": "#2563EB"
       },
       "edgeToEdgeEnabled": true,
+      "softwareKeyboardLayoutMode": "pan",
       "predictiveBackGestureEnabled": false
     }
   }
