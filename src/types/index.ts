@@ -26,6 +26,7 @@ export interface Report {
   id: string;
   tenantId?: string;
   userId: string;
+  userName?: string;
   title: string;
   description: string;
   category: string;

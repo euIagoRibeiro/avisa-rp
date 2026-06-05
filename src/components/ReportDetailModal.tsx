@@ -190,7 +190,7 @@ export function ReportDetailModal({ report, onClose }: Props) {
                   borderRadius: 10,
                   paddingHorizontal: 10,
                   paddingVertical: 8,
-                  marginBottom: report.description ? 12 : 0,
+                  marginBottom: 8,
                 }}
               >
                 <Ionicons name="location-outline" size={14} color="#9ca3af" />
@@ -198,6 +198,44 @@ export function ReportDetailModal({ report, onClose }: Props) {
                   {report.address}
                 </Text>
               </View>
+
+              {isAdmin && (
+                report.isAnonymous ? (
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: 6,
+                      backgroundColor: '#f3f4f6',
+                      borderRadius: 10,
+                      paddingHorizontal: 10,
+                      paddingVertical: 8,
+                      marginBottom: report.description ? 8 : 0,
+                    }}
+                  >
+                    <Ionicons name="eye-off-outline" size={14} color="#9ca3af" />
+                    <Text style={{ fontSize: 13, color: '#6b7280' }}>Anônimo</Text>
+                  </View>
+                ) : (
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      backgroundColor: '#f9fafb',
+                      borderRadius: 10,
+                      paddingHorizontal: 10,
+                      paddingVertical: 8,
+                      gap: 6,
+                      marginBottom: report.description ? 8 : 0,
+                    }}
+                  >
+                    <Ionicons name="person-outline" size={14} color="#9ca3af" />
+                    <Text style={{ fontSize: 13, color: '#6b7280', flex: 1 }}>
+                      {'Denunciante · ' + (report.userName ?? `#${report.userId.slice(0, 8)}`)}
+                    </Text>
+                  </View>
+                )
+              )}
 
               {!!report.description && (
                 <Text style={{ fontSize: 14, color: '#374151', lineHeight: 20 }}>
