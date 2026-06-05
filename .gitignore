@@ -44,3 +44,6 @@ yarn-error.*
 CLAUDE.md
 DEVELOPMENT_ROADMAP.md
 .claude*
+
+# Local environment config (contains real IP — each dev sets their own)
+src/config/env.ts

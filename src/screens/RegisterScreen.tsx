@@ -62,12 +62,13 @@ export function RegisterScreen() {
     if (err) { setError(err); return; }
     setError('');
     setLoading(true);
-    const ok = await register({ name: name.trim(), email: email.trim(), phone, password });
-    setLoading(false);
-    if (ok) {
+    try {
+      await register({ name: name.trim(), email: email.trim(), phone, password });
+      setLoading(false);
       navigation.navigate('OTP');
-    } else {
-      setError('Telefone já cadastrado. Tente fazer login.');
+    } catch (err) {
+      setLoading(false);
+      setError(err instanceof Error ? err.message : 'Erro ao cadastrar. Tente novamente.');
     }
   }
 

@@ -46,7 +46,7 @@ export function Map({ coordinates, onRegionChange, onLocationPress, reports, sho
         showsMyLocationButton={false}
         onRegionChangeComplete={onRegionChange}
       >
-        {showHeatmap ? (
+        {showHeatmap && reports.length > 0 ? (
           <Heatmap
             points={reports.map((r) => ({
               latitude: r.coordinates.lat,
