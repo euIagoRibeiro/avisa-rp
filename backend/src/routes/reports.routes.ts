@@ -54,6 +54,7 @@ const UpdateStatusSchema = z.object({
 interface ReportRow {
   id:           string;
   user_id:      string;
+  user_name?:   string | null;
   title:        string;
   description:  string | null;
   category:     string;
@@ -99,6 +100,7 @@ function formatReport(
     status:      report.status,
     isAnonymous,
     userId:      isAnonymous && !isAdmin ? undefined : report.user_id,
+    userName:    isAnonymous ? null : (report.user_name ?? null),
     photos:      photos.map(p => p.url),
     createdAt:   toISO(report.created_at),
     updates:     updates.map(u => ({
@@ -134,22 +136,22 @@ router.get('/', async (req: Request, res: Response): Promise<void> => {
 
   try {
     const buildQuery = () => {
-      let q = db('reports');
-      if (role === 'cidadao') q = q.where('user_id', userId);
-      if (status)   q = q.where('status',   status);
-      if (category) q = q.where('category', category);
+      let q = db('reports').leftJoin('users', 'reports.user_id', 'users.id');
+      if (role === 'cidadao') q = q.where('reports.user_id', userId);
+      if (status)   q = q.where('reports.status',   status);
+      if (category) q = q.where('reports.category', category);
       if (search) {
         q = q.where(qb => {
-          qb.where('title', 'like', `%${search}%`)
-            .orWhere('address', 'like', `%${search}%`);
+          qb.where('reports.title', 'like', `%${search}%`)
+            .orWhere('reports.address', 'like', `%${search}%`);
         });
       }
       return q;
     };
 
     const [countRow, rows] = await Promise.all([
-      buildQuery().count<{ count: string }>({ count: '*' }).first(),
-      buildQuery().orderBy('created_at', 'desc').limit(limit).offset(offset).select('*'),
+      buildQuery().count<{ count: string }>({ count: 'reports.id' }).first(),
+      buildQuery().orderBy('reports.created_at', 'desc').limit(limit).offset(offset).select('reports.*', 'users.name as user_name'),
     ]);
 
     const total = parseInt(String(countRow?.count ?? '0'), 10);

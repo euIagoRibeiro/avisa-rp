@@ -4,6 +4,7 @@ import { createHash, randomUUID } from 'crypto';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import db from '../config/database';
+import { authenticate } from '../middleware/auth';
 
 const router = Router();
 
@@ -57,6 +58,10 @@ const LoginSchema = z.object({
 
 const ResendOTPSchema = z.object({
   phone: z.string().min(10).max(15),
+});
+
+const UpdateProfileSchema = z.object({
+  name: z.string().min(1),
 });
 
 // ── POST /v1/auth/register ────────────────────────────────────────────────────
@@ -270,6 +275,44 @@ router.post('/resend-otp', async (req: Request, res: Response): Promise<void> =>
     res.status(200).json({ message: `Novo código enviado para ${formatPhone(phone)}` });
   } catch (err) {
     console.error('[resend-otp]', err);
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+});
+
+// ── PUT /v1/auth/profile ──────────────────────────────────────────────────────
+
+router.put('/profile', authenticate, async (req: Request, res: Response): Promise<void> => {
+  const parsed = UpdateProfileSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(422).json({ error: 'Dados inválidos', details: parsed.error.flatten() });
+    return;
+  }
+
+  const { userId } = req.user!;
+  const { name } = parsed.data;
+
+  try {
+    const existing = await db('users').where('id', userId).first();
+
+    if (!existing) {
+      res.status(404).json({ error: 'Usuário não encontrado' });
+      return;
+    }
+
+    await db('users').where('id', userId).update({ name });
+
+    const updated = await db('users').where('id', userId).first();
+
+    res.json({
+      user: {
+        id:    updated.id,
+        name:  updated.name,
+        email: updated.email,
+        role:  updated.role,
+      },
+    });
+  } catch (err) {
+    console.error('[PUT /profile]', err);
     res.status(500).json({ error: 'Erro interno do servidor' });
   }
 });
